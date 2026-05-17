@@ -1,8 +1,8 @@
 import express from 'express'
 import { addProduct } from '../controllers/ecommerce.controllers.js'
 
-const router = express.Router()
+const ecommerceRouter = express.Router()
 
-router.post('/addProducts', addProduct)
+ecommerceRouter.post('/addProducts', addProduct)
 
-export default router
+export default ecommerceRouter
