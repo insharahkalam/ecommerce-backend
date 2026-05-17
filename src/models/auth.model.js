@@ -16,6 +16,7 @@ const authSchema = mongoose.Schema({
     password: {
         type: String,
         required: true,
+        minLength: 6,
         trim: true
     },
     role: {
@@ -33,5 +34,5 @@ const authSchema = mongoose.Schema({
 },
     { timestamps: true })
 
-const User = mongoose.model("users", authSchema)
-export default User
+const userModel = mongoose.model("users", authSchema)
+export default userModel
