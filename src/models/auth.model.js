@@ -24,15 +24,17 @@ const authSchema = mongoose.Schema({
         enum: ['admin', 'user'],
         default: 'user'
     },
-    resetPasswordToken: {
-        type: String
+    resetToken: {
+        type: String,
+        default: null
     },
-
-    resetPasswordExpire: {
-        type: Date
+    resetTokenExpire: {
+        type: Date,
+        default: null
     }
+
 },
     { timestamps: true })
 
-const userModel = mongoose.model("users", authSchema)
-export default userModel
+const User = mongoose.model("users", authSchema)
+export default User

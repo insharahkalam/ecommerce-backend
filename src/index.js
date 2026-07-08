@@ -6,8 +6,8 @@ import dotenv from 'dotenv'
 dotenv.config()
 import connectDB from './db/db.js';
 
-import ecommerceRouter from './router/ecommerce.router.js'
-import authRouter from './router/auth.router.js'
+import productRoutes from './router/product.router.js'
+import authRoutes from './router/auth.router.js'
 
 const app = expess()
 app.use(expess.json())
@@ -21,10 +21,9 @@ app.get('/', (req, res) => {
 })
 
 
-app.use("/api/auth",authRouter)
-app.use("/api/ecommerce",ecommerceRouter)
+app.use("/api/authentication", authRoutes)
+app.use("/api/products", productRoutes)
 
 app.listen(process.env.PORT, () => {
     console.log(`server is running on port ${process.env.PORT}`);
-
 })

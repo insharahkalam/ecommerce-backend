@@ -1,9 +1,13 @@
 import express from 'express'
-import { cretaeUser, loginUser } from '../controllers/auth.controllers.js'
+import { cretaeUser, forgotPass, getUser, loginUser, resetPassword, logout } from '../controllers/auth.controllers.js'
 
-const authRouter = express.Router()
+const authRoutes = express.Router()
 
-authRouter.post('/creatUser', cretaeUser)
-authRouter.post('/loginUser', loginUser)
+authRoutes.post('/register', cretaeUser)
+authRoutes.post('/login', loginUser)
+authRoutes.post("/reset-password", resetPassword);
+authRoutes.post('/forgot-password', forgotPass)
+authRoutes.get('/ViewAllUsers', getUser)
+authRoutes.get('/logout', logout)
 
-export default authRouter
+export default authRoutes
