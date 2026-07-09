@@ -5,12 +5,16 @@ import expess from 'express'
 import dotenv from 'dotenv'
 dotenv.config()
 import connectDB from './db/db.js';
-
 import productRoutes from './router/product.router.js'
 import authRoutes from './router/auth.router.js'
+import cors from 'cors'
 
 const app = expess()
 app.use(expess.json())
+app.use(cors({
+    origin: ["http://localhost:5173", "https://ecommerce-frontend-pink-beta.vercel.app"],
+    Credential: true
+}))
 
 connectDB()
 
