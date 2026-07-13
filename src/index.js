@@ -13,7 +13,7 @@ const app = expess()
 app.use(expess.json())
 app.use(cors({
     origin: ["http://localhost:5173", "https://ecommerce-frontend-pink-beta.vercel.app"],
-    Credential: true
+    credentials: true
 }))
 
 connectDB()
