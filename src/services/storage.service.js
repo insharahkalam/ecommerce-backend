@@ -13,13 +13,13 @@ cloudinary.config({
 const uploadImg = async (file) => {
     console.log(file, "===>cloud check file");
 
-    const fileName = `Posts-${file.originalname.split(".")[0]}_${Date.now()}`
+    const fileName = `product-${file.originalname.split(".")[0]}_${Date.now()}`
     console.log(fileName, "=========>check filename");
 
     const uploadStreme = new Promise((resolve, reject) => {
         const upload = cloudinary.uploader.upload_stream({
             public_id: fileName,
-            folder: "products",
+            folder: "ApnaBazar",
             overwrite: false,
             unique_filename: true,
             use_filename: true,
@@ -57,15 +57,15 @@ const updateImg = async (pubId, file) => {
         const delRes = await cloudinary.uploader.destroy(pubId, {
             resource_type: "image"
         });
-        console.log(delRes, "old prod deleted");
+        console.log(delRes, "old product deleted");
 
-        const fileName = `Posts-${file.originalname.split(".")[0]}_${Date.now()}`
+        const fileName = `Product-${file.originalname.split(".")[0]}_${Date.now()}`
         console.log(fileName, "=========>check new filename");
 
         const updateStreme = new Promise((resolve, reject) => {
             const update = cloudinary.uploader.upload_stream({
                 public_id: fileName,
-                folder: "products",
+                folder: "ApnaBazar",
                 overwrite: false,
                 unique_filename: true,
                 use_filename: true,

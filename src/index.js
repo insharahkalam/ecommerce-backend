@@ -8,9 +8,11 @@ import connectDB from './db/db.js';
 import productRoutes from './router/product.router.js'
 import authRoutes from './router/auth.router.js'
 import cors from 'cors'
+import cookieParser from "cookie-parser";
 
 const app = expess()
 app.use(expess.json())
+app.use(cookieParser());
 app.use(cors({
     origin: ["http://localhost:5173", "https://ecommerce-frontend-pink-beta.vercel.app"],
     credentials: true
@@ -23,7 +25,6 @@ app.get('/', (req, res) => {
         message: "server in running"
     })
 })
-
 
 app.use("/api/authentication", authRoutes)
 app.use("/api/products", productRoutes)

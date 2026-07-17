@@ -1,4 +1,4 @@
-import userSchema from "../models/auth.model.js";
+import User from "../models/auth.model.js";
 import product from "../models/product.model.js";
 import { deleteImg, updateImg, uploadImg } from "../services/storage.service.js";
 
@@ -7,11 +7,16 @@ const createProduct = async (req, res) => {
     try {
         const { title, description, price, category, brand, stock, discount, featured } = req.body;
 
-        // 1. Validate first
-        if (!title || !description || !price || !category || !brand || !stock || !discount || !featured || !req.file) {
+        if (!title || !description || price == null || !category || !req.file) {
             return res.status(400).json({
-                message: "All fields are required!"
+                message: "Required fields are missing"
             });
+        }
+
+        let specifications = {};
+
+        if (req.body.specifications) {
+            specifications = JSON.parse(req.body.specifications);
         }
 
         // 2. Upload image
@@ -33,6 +38,7 @@ const createProduct = async (req, res) => {
             stock,
             discount,
             featured,
+            specifications,
             image: uplodCheck.secure_url,
             public_id: uplodCheck.public_id
         });
@@ -64,12 +70,12 @@ const deleteProduct = async (req, res) => {
         console.log('result in deleting data-->', deleProd);
 
         if (deleProd == null) {
-            return res.status(404).json({ status: false, message: 'product not found' })
+            return res.status(404).json({ message: 'product not found' })
         }
-        return res.status(200).json({ status: false, message: 'SUCCESSFULLY DELETEED' })
+        return res.status(200).json({ message: 'PRODUCT SUCCESSFULLY DELETEED!' })
 
     } catch (error) {
-        return res.status(400).json({ status: false, message: error.message })
+        return res.status(400).json({ message: error.message })
     }
 }
 
@@ -77,7 +83,7 @@ const getAllProduct = async (req, res) => {
     try {
         const getProduct = await product.find()
         res.status(200).json({
-            message: "fetched success",
+            message: "Products fetched successfully! ",
             getProduct
 
         })
@@ -109,27 +115,58 @@ const getProduct = async (req, res) => {
 }
 
 const updateProduct = async (req, res) => {
-    const { title, description, price, category, brand, stock, discount, featured } = req.body
-    const { id } = req.params
-    const updateData = { title, description, price, category, brand, stock, discount, featured }
+    try {
+        const { id } = req.params;
 
-    if (req.file) {
-        const findpro = await product.findById(id)
-        const updImg = await updateImg(findpro.public_id, req.file)
-        console.log(updImg, "====> check the result");
-        const { secure_url, public_id } = updImg
-        updateData.image = secure_url,
-            updateData.public_id = public_id
+        const findPro = await product.findById(id);
+
+        if (!findPro) {
+            return res.status(404).json({
+                message: "Product not found!"
+            });
+        }
+
+        const { title, description, price, category, brand, stock, discount, featured } = req.body;
+
+        const updateData = {};
+
+        if (title !== undefined) updateData.title = title;
+        if (description !== undefined) updateData.description = description;
+        if (price !== undefined) updateData.price = price;
+        if (category !== undefined) updateData.category = category;
+        if (brand !== undefined) updateData.brand = brand;
+        if (stock !== undefined) updateData.stock = stock;
+        if (discount !== undefined) updateData.discount = discount;
+        if (featured !== undefined) updateData.featured = featured;
+
+        // Update Specifications
+        if (req.body.specifications) {
+            updateData.specifications = JSON.parse(req.body.specifications);
+        }
+
+        // Update Image
+        if (req.file) {
+            const updImg = await updateImg(findPro.public_id, req.file);
+
+            updateData.image = updImg.secure_url;
+            updateData.public_id = updImg.public_id;
+        }
+
+        const updatedProduct = await product.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+
+        return res.status(200).json({
+            message: "Product updated successfully!",
+            product: updatedProduct
+        });
+
+    } catch (error) {
+        console.log(error, "Error updating product");
+
+        return res.status(500).json({
+            message: "Error in updating product"
+        });
     }
+};
 
-    const updProd = await product.findByIdAndUpdate(id, updateData,
-        { new: true }
-    )
-    console.log(updProd, 'update check');
-    return res.status(201).json({
-        message: 'product updated success!',
-        updProd
-    })
-}
 
 export { createProduct, deleteProduct, getProduct, getAllProduct, updateProduct };

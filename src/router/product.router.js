@@ -1,25 +1,16 @@
 import express from 'express'
-import { createProduct } from '../controllers/product.controllers.js'
+import { createProduct, deleteProduct, getAllProduct, getProduct, updateProduct } from '../controllers/product.controllers.js'
+import multer from 'multer'
+import { adminCheck } from '../middleware/AdminMiddleware.js'
 
-const productRoutes = express.Router()
+const upload = multer({ storage: multer.memoryStorage() })
 
-productRoutes.post('/createProduct', createProduct)
+const productRouter = express.Router()
 
-export default productRoutes
+productRouter.get('/get-all-Product', getAllProduct)
+productRouter.get('/get-Product/:id', getProduct)
+productRouter.post('/create-product', adminCheck, upload.single("image"), createProduct)
+productRouter.put('/update-product/:id', adminCheck, upload.single("image"), updateProduct)
+productRouter.delete('/delete-product/:id', adminCheck, deleteProduct)
 
-
-
-// import express from "express";
-// import multer from "multer";
-// import { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct } from "../controllers/productController.js";
-
-// const upload = multer({ dest: "temp/" });
-// const router = express.Router();
-
-// router.post("/", upload.single("image"), createProduct);
-// router.get("/", getAllProducts);
-// router.get("/:id", getProductById);
-// router.put("/:id", upload.single("image"), updateProduct);
-// router.delete("/:id", deleteProduct);
-
-// export default router;
+export default productRouter
