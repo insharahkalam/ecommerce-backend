@@ -7,9 +7,9 @@ const upload = multer({ storage: multer.memoryStorage() })
 
 const productRouter = express.Router()
 
-productRouter.get('/get-all-Product', getAllProduct)
+productRouter.get('/getAllProduct', getAllProduct)
 productRouter.get('/get-Product/:id', getProduct)
-productRouter.post('/create-product', adminCheck, upload.single("image"), createProduct)
+productRouter.post('/createProduct', adminCheck, upload.single("image"), createProduct)
 productRouter.put('/update-product/:id', adminCheck, upload.single("image"), updateProduct)
 productRouter.delete('/delete-product/:id', adminCheck, deleteProduct)
 
