@@ -285,5 +285,31 @@ const logout = (req, res) => {
     }
 }
 
+const getMe = async (req, res) => {
+    try {
+        const token = req.cookies.token;
 
-export { cretaeUser, getUser, loginUser, forgotPass, resetPassword, logout }
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRETS);
+
+        const user = await User.findById(decoded.id).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+            message: "User fetched successfully!",
+            user
+        });
+    } catch (error) {
+        console.log(error, "error in getMe");
+        res.status(401).json({ message: "Invalid or expired token" });
+    }
+};
+
+
+export { cretaeUser, getUser, loginUser, forgotPass, resetPassword, logout, getMe }

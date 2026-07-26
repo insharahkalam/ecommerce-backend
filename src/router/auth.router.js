@@ -1,5 +1,6 @@
 import express from 'express'
-import { cretaeUser, forgotPass, getUser, loginUser, resetPassword, logout } from '../controllers/auth.controllers.js'
+import { cretaeUser, forgotPass, getUser, loginUser, resetPassword, logout, getMe } from '../controllers/auth.controllers.js'
+import { adminCheck } from '../middleware/AdminMiddleware.js'
 
 const authRoutes = express.Router()
 
@@ -9,5 +10,6 @@ authRoutes.post("/reset-password", resetPassword);
 authRoutes.post('/forgot-password', forgotPass)
 authRoutes.get('/ViewAllUsers', getUser)
 authRoutes.get('/logout', logout)
+authRoutes.get('/getMe', adminCheck, getMe)
 
 export default authRoutes
