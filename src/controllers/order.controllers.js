@@ -1,5 +1,5 @@
 import Order from "../models/order.model.js";
-
+import User from "../models/auth.model.js";
 // Customer places an order (COD or Bank Transfer)
 const createOrder = async (req, res) => {
     try {
@@ -57,6 +57,8 @@ const getAllOrders = async (req, res) => {
         const orders = await Order.find()
             .populate("user", "username email")
             .sort({ createdAt: -1 });
+
+        console.log(orders, "check order errr");
 
         return res.status(200).json({
             message: "Orders fetched successfully!",

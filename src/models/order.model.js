@@ -9,7 +9,7 @@ const orderItemSchema = new mongoose.Schema({
 }, { _id: false });
 
 const orderSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
 
     items: { type: [orderItemSchema], required: true, validate: v => Array.isArray(v) && v.length > 0 },
 
