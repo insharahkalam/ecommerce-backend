@@ -1,14 +1,7 @@
 import express from 'express'
-import {
-    createOrder,
-    getAllOrders,
-    getMyOrders,
-    getOrder,
-    updateOrderStatus,
-    deleteOrder
-} from '../controllers/order.controllers.js'
+import { createOrder, getAllOrders, getMyOrders, getOrder, updateOrderStatus, deleteOrder } from '../controllers/order.controllers.js'
 import { adminCheck } from '../middleware/AdminMiddleware.js'
-import { userCheck } from '../middleware/userCheckMiddleware.js' // 👈 apna asal file path yahan lagao
+import { userCheck } from '../middleware/UserMiddleware.js'
 
 const orderRouter = express.Router()
 
