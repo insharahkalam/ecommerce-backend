@@ -1,5 +1,6 @@
 import Order from "../models/order.model.js";
 import User from "../models/auth.model.js";
+
 // Customer places an order (COD or Bank Transfer)
 const createOrder = async (req, res) => {
     try {
@@ -27,8 +28,14 @@ const createOrder = async (req, res) => {
             return res.status(400).json({ message: "Complete shipping address is required." });
         }
 
-        if (paymentMethod === "Bank Transfer" && (!bankTransferDetails || !bankTransferDetails.transactionId)) {
-            return res.status(400).json({ message: "Transaction ID is required for bank transfer orders." });
+        // Bank Transfer ke liye transaction ID aur receipt image dono zaroori hain (verification ke liye)
+        if (paymentMethod === "Bank Transfer") {
+            if (!bankTransferDetails || !bankTransferDetails.transactionId) {
+                return res.status(400).json({ message: "Transaction ID is required for bank transfer orders." });
+            }
+            if (!bankTransferDetails.receiptImage) {
+                return res.status(400).json({ message: "Payment receipt is required for bank transfer orders." });
+            }
         }
 
         const order = await Order.create({
@@ -37,12 +44,17 @@ const createOrder = async (req, res) => {
             totalAmount,
             paymentMethod,
             shippingAddress,
-            bankTransferDetails: paymentMethod === "Bank Transfer" ? bankTransferDetails : undefined
+            // Bank transfer orders admin verify hone tak "Pending" rehte hain
+            paymentStatus: paymentMethod === "Bank Transfer" ? "Pending" : undefined,
+            bankTransferDetails: paymentMethod === "Bank Transfer" ? bankTransferDetails : undefined,
         });
 
         return res.status(201).json({
-            message: "Order placed successfully!",
-            order
+            message:
+                paymentMethod === "Bank Transfer"
+                    ? "Order placed! We'll verify your payment and update the status shortly."
+                    : "Order placed successfully!",
+            order,
         });
 
     } catch (error) {
@@ -57,8 +69,6 @@ const getAllOrders = async (req, res) => {
         const orders = await Order.find()
             .populate("user", "username email")
             .sort({ createdAt: -1 });
-
-        console.log(orders, "check order errr");
 
         return res.status(200).json({
             message: "Orders fetched successfully!",
@@ -107,6 +117,7 @@ const getOrder = async (req, res) => {
 };
 
 // Admin — update order status (Pending / Fulfilled / Refunded) and/or payment status
+// Yahi endpoint admin bank transfer receipt dekh kar order ko "Paid" verify karega
 const updateOrderStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -118,7 +129,7 @@ const updateOrderStatus = async (req, res) => {
             return res.status(404).json({ message: "Order not found." });
         }
 
-        if (status && ["Pending", "Fulfilled", "Refunded"].includes(status)) {
+        if (status && ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"].includes(status)) {
             order.status = status;
         }
 
