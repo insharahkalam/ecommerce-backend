@@ -6,7 +6,7 @@ const createOrder = async (req, res) => {
     try {
         const userId = req.user?.id || req.body.userId; // depends on how your isAuth middleware attaches user
 
-        const { items, totalAmount, paymentMethod, shippingAddress, bankTransferDetails } = req.body;
+        const { items, totalAmount, paymentMethod, shippingAddress, transferDetails } = req.body;
 
         if (!userId) {
             return res.status(401).json({ message: "Please login to place an order." });
