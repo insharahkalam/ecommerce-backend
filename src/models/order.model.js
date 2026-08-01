@@ -17,7 +17,7 @@ const orderSchema = new mongoose.Schema({
 
     paymentMethod: {
         type: String,
-        enum: ["COD", "Bank Transfer"],
+        enum: ["COD", "Bank Transfer", "Easypaisa"],
         required: true
     },
 
@@ -30,12 +30,11 @@ const orderSchema = new mongoose.Schema({
         }
     },
 
-    // Only relevant when paymentMethod === "Bank Transfer"
-    bankTransferDetails: {
-        bankName: { type: String },
+    transferDetails: {
         accountTitle: { type: String },
+        accountNumber: { type: String },
         transactionId: { type: String },
-        receiptImage: { type: String } // uploaded slip/screenshot URL, optional
+        receiptImage: { type: String }
     },
 
     status: {

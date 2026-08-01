@@ -20,21 +20,21 @@ const createOrder = async (req, res) => {
             return res.status(400).json({ message: "Total amount is required." });
         }
 
-        if (!paymentMethod || !["COD", "Bank Transfer"].includes(paymentMethod)) {
-            return res.status(400).json({ message: "Valid payment method is required (COD or Bank Transfer)." });
+        if (!paymentMethod || !["COD", "Bank Transfer", "Easypaisa"].includes(paymentMethod)) {
+            return res.status(400).json({ message: "Valid payment method is required (COD, Bank Transfer or Easypaisa)." });
         }
 
         if (!shippingAddress || !shippingAddress.fullName || !shippingAddress.phone || !shippingAddress.address || !shippingAddress.city) {
             return res.status(400).json({ message: "Complete shipping address is required." });
         }
 
-        // Bank Transfer ke liye transaction ID aur receipt image dono zaroori hain (verification ke liye)
-        if (paymentMethod === "Bank Transfer") {
-            if (!bankTransferDetails || !bankTransferDetails.transactionId) {
-                return res.status(400).json({ message: "Transaction ID is required for bank transfer orders." });
+        // Bank Transfer & Easypaisa dono ke liye transaction ID + receipt zaroori hai
+        if (paymentMethod === "Bank Transfer" || paymentMethod === "Easypaisa") {
+            if (!transferDetails || !transferDetails.transactionId) {
+                return res.status(400).json({ message: "Transaction ID is required." });
             }
-            if (!bankTransferDetails.receiptImage) {
-                return res.status(400).json({ message: "Payment receipt is required for bank transfer orders." });
+            if (!transferDetails.receiptImage) {
+                return res.status(400).json({ message: "Payment receipt is required." });
             }
         }
 
@@ -44,9 +44,8 @@ const createOrder = async (req, res) => {
             totalAmount,
             paymentMethod,
             shippingAddress,
-            // Bank transfer orders admin verify hone tak "Pending" rehte hain
-            paymentStatus: paymentMethod === "Bank Transfer" ? "Pending" : undefined,
-            bankTransferDetails: paymentMethod === "Bank Transfer" ? bankTransferDetails : undefined,
+            paymentStatus: paymentMethod === "COD" ? undefined : "Pending",
+            transferDetails: paymentMethod !== "COD" ? transferDetails : undefined,
         });
 
         return res.status(201).json({
