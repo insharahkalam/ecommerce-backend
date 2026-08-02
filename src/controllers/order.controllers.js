@@ -1,5 +1,6 @@
 import Order from "../models/order.model.js";
 import User from "../models/auth.model.js";
+import pusher from "../services/pusher.service.js";
 
 // Customer places an order (COD or Bank Transfer)
 const createOrder = async (req, res) => {
@@ -115,8 +116,6 @@ const getOrder = async (req, res) => {
     }
 };
 
-// Admin — update order status (Pending / Fulfilled / Refunded) and/or payment status
-// Yahi endpoint admin bank transfer receipt dekh kar order ko "Paid" verify karega
 const updateOrderStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -137,6 +136,17 @@ const updateOrderStatus = async (req, res) => {
         }
 
         await order.save();
+
+        // Real-time push — user ke channel pe event bhejo
+        try {
+            await pusher.trigger(`user-${order.user}`, "order-updated", {
+                orderId: order._id.toString(),
+                status: order.status,
+                paymentStatus: order.paymentStatus,
+            });
+        } catch (pushErr) {
+            console.log(pushErr, "pusher trigger failed"); // fail ho bhi jaye to order update rukni nahi chahiye
+        }
 
         return res.status(200).json({ message: "Order updated successfully!", order });
     } catch (error) {
