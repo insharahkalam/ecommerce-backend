@@ -1,4 +1,4 @@
-import Order from "../models/order.model.js";
+import orders from '../models/order.model.js'
 import User from "../models/auth.model.js";
 import pusher from "../services/pusher.service.js";
 
@@ -117,11 +117,16 @@ const getOrder = async (req, res) => {
 };
 
 const updateOrderStatus = async (req, res) => {
+    console.log("🔵 updateOrderStatus called with:", req.params, req.body);
     try {
         const { id } = req.params;
+        console.log(id, "check id testing");
+
         const { status, paymentStatus } = req.body;
 
-        const order = await Order.findById(id);
+        const order = await orders.findById(id);
+
+        console.log("Order user:", order);
 
         if (!order) {
             return res.status(404).json({ message: "Order not found." });
@@ -139,13 +144,20 @@ const updateOrderStatus = async (req, res) => {
 
         // Real-time push — user ke channel pe event bhejo
         try {
+            console.log("Triggering pusher on channel:", `user-${order.user}`);
             await pusher.trigger(`user-${order.user}`, "order-updated", {
                 orderId: order._id.toString(),
                 status: order.status,
                 paymentStatus: order.paymentStatus,
             });
+            console.log("Pusher trigger sent successfully");
+            await pusher.trigger("admin-orders", "order-updated", {
+                orderId: order._id.toString(),
+                status: order.status,
+                paymentStatus: order.paymentStatus,
+            });
         } catch (pushErr) {
-            console.log(pushErr, "pusher trigger failed"); // fail ho bhi jaye to order update rukni nahi chahiye
+            console.log(pushErr, "pusher trigger failed");
         }
 
         return res.status(200).json({ message: "Order updated successfully!", order });
