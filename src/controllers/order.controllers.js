@@ -39,7 +39,7 @@ const createOrder = async (req, res) => {
             }
         }
 
-        const order = await Order.create({
+        const order = await orders.create({
             user: userId,
             items,
             totalAmount,
@@ -66,13 +66,13 @@ const createOrder = async (req, res) => {
 // Admin — fetch every order
 const getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.find()
+        const order = await orders.find()
             .populate("user", "username email")
             .sort({ createdAt: -1 });
 
         return res.status(200).json({
             message: "Orders fetched successfully!",
-            orders
+            order
         });
     } catch (error) {
         console.log(error, "error fetching orders");
@@ -89,7 +89,7 @@ const getMyOrders = async (req, res) => {
             return res.status(401).json({ message: "Please login first." });
         }
 
-        const orders = await Order.find({ user: userId }).sort({ createdAt: -1 });
+        const orders = await orders.find({ user: userId }).sort({ createdAt: -1 });
 
         return res.status(200).json({
             message: "Your orders fetched successfully!",
@@ -104,7 +104,7 @@ const getMyOrders = async (req, res) => {
 const getOrder = async (req, res) => {
     try {
         const { id } = req.params;
-        const order = await Order.findById(id).populate("user", "username email");
+        const order = await orders.findById(id).populate("user", "username email");
 
         if (!order) {
             return res.status(404).json({ message: "Order not found." });
@@ -170,7 +170,7 @@ const updateOrderStatus = async (req, res) => {
 const deleteOrder = async (req, res) => {
     try {
         const { id } = req.params;
-        const deleted = await Order.findByIdAndDelete(id);
+        const deleted = await orders.findByIdAndDelete(id);
 
         if (!deleted) {
             return res.status(404).json({ message: "Order not found." });
