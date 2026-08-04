@@ -89,11 +89,11 @@ const getMyOrders = async (req, res) => {
             return res.status(401).json({ message: "Please login first." });
         }
 
-        const orders = await orders.find({ user: userId }).sort({ createdAt: -1 });
+        const order = await orders.find({ user: userId }).sort({ createdAt: -1 });
 
         return res.status(200).json({
             message: "Your orders fetched successfully!",
-            orders
+            order
         });
     } catch (error) {
         console.log(error, "error fetching user orders");

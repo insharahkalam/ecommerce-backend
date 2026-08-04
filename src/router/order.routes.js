@@ -6,7 +6,7 @@ import { userCheck } from '../middleware/UserMiddleware.js'
 const orderRouter = express.Router()
 
 orderRouter.post('/createOrder', userCheck, createOrder)
-orderRouter.get('/my-orders', userCheck, getMyOrders)
+orderRouter.get('/myOrders', userCheck, getMyOrders)
 orderRouter.get('/getAllOrders', adminCheck, getAllOrders)
 orderRouter.get('/get-order/:id', adminCheck, getOrder)
 orderRouter.put('/update-status/:id', adminCheck, updateOrderStatus)
