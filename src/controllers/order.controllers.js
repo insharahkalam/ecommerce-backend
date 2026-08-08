@@ -46,7 +46,7 @@ const createOrder = async (req, res) => {
         // jo items decrement ho chuke the unko rollback (revert) kar dete hain.
         const decrementedItems = [];
 
-        console.log("📦 Items received:", JSON.stringify(items, null, 2)); // ADD THIS
+        console.log("Items received:", JSON.stringify(items, null, 2)); // ADD THIS
 
         for (const item of items) {
             const productId = item.product; // ⚠️ apne items structure ke hisaab se field name confirm kar lena
