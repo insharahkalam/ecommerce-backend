@@ -4,6 +4,7 @@ import User from "../models/auth.model.js";
 import jwt from "jsonwebtoken";
 import crypto from 'crypto'
 import nodemailer from 'nodemailer'
+import { createNotification } from "../utils/createNotification.js";
 
 const cretaeUser = async (req, res) => {
     try {
@@ -42,6 +43,14 @@ const cretaeUser = async (req, res) => {
             email,
             password: hashPass,
             role: "user",
+        });
+
+        await createNotification({
+            type: "new_customer",
+            title: "New Customer Registered",
+            message: `${user.username} just signed up`,
+            link: `/customers/${user._id}`,
+            relatedId: user._id,
         });
 
         res.status(201).json({

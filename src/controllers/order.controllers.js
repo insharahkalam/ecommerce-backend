@@ -2,6 +2,7 @@ import orders from '../models/order.model.js'
 import User from "../models/auth.model.js";
 import pusher from "../services/pusher.service.js";
 import products from "../models/product.model.js"; // apna actual product model path daal dena
+import { createNotification } from "../utils/createNotification.js";
 
 // Customer places an order (COD or Bank Transfer)
 
@@ -75,6 +76,15 @@ const createOrder = async (req, res) => {
             }
 
             decrementedItems.push({ productId, quantity });
+            if (updatedProduct.stock <= 5) { // apna threshold adjust kar lena
+                await createNotification({
+                    type: "low_stock",
+                    title: "Low Stock Alert",
+                    message: `${updatedProduct.name} has only ${updatedProduct.stock} units left`,
+                    link: `/add-product/${updatedProduct._id}`,
+                    relatedId: updatedProduct._id,
+                });
+            }
         }
 
         // ---- STEP 2: Order create ----
@@ -86,6 +96,14 @@ const createOrder = async (req, res) => {
             shippingAddress,
             paymentStatus: paymentMethod === "COD" ? undefined : "Pending",
             transferDetails: paymentMethod !== "COD" ? transferDetails : undefined,
+        });
+
+        await createNotification({
+            type: "order",
+            title: "New Order Received",
+            message: `New order placed — Rs. ${totalAmount} (${paymentMethod})`,
+            link: `/orders/${order._id}`,
+            relatedId: order._id,
         });
 
         return res.status(201).json({

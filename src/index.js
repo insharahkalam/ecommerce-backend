@@ -10,6 +10,7 @@ import authRoutes from './router/auth.router.js'
 import cors from 'cors'
 import cookieParser from "cookie-parser";
 import orderRouter from './router/order.routes.js'
+import notificationRoutes from "./router/notificationRoutes.js";
 
 const app = expess()
 app.use(expess.json())
@@ -30,6 +31,7 @@ app.get('/', (req, res) => {
 app.use("/api/authentication", authRoutes)
 app.use("/api/products", productRoutes)
 app.use("/api/orders", orderRouter)
+app.use("/api/notifications", notificationRoutes);
 
 app.listen(process.env.PORT, () => {
     console.log(`server is running on port ${process.env.PORT}`);
