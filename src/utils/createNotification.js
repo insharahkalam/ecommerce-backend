@@ -1,9 +1,9 @@
-import notifications from "../models/notifications.js"
+import Notifications from "../models/notifications.js"
 import pusher from "../services/pusher.service.js";
 
 export const createNotification = async ({ type, title, message, link, relatedId }) => {
   try {
-    const notification = await notification.create({ type, title, message, link, relatedId });
+    const notification = await Notifications.create({ type, title, message, link, relatedId });
 
     await pusher.trigger("admin-notifications", "new-notification", notification);
 
