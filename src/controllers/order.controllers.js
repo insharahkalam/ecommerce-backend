@@ -80,7 +80,7 @@ const createOrder = async (req, res) => {
                 await createNotification({
                     type: "low_stock",
                     title: "Low Stock Alert",
-                    message: `${updatedProduct.name} has only ${updatedProduct.stock} units left`,
+                    message: `${updatedProduct.title} has only ${updatedProduct.stock} units left`,
                     link: `/add-product/${updatedProduct._id}`,
                     relatedId: updatedProduct._id,
                 });
@@ -295,7 +295,7 @@ async function restoreStock(items) {
 
         if (!productId || quantity <= 0) continue;
 
-        await Product.findByIdAndUpdate(productId, {
+        await products.findByIdAndUpdate(productId, {
             $inc: { stock: quantity, sold: -quantity },
         });
     }
