@@ -31,4 +31,13 @@ router.patch("/read-all", async (req, res) => {
     }
 });
 
+router.get("/unread-count", async (req, res) => {
+    try {
+        const unreadCount = await Notification.countDocuments({ isRead: false });
+        res.json({ unreadCount });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 export default router;
