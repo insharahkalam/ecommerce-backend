@@ -42,7 +42,6 @@ const createOrder = async (req, res) => {
 
         const notifSettings = await NotificationSettings.findOne();
         const notifyOrdersEnabled = notifSettings ? notifSettings.notifyOrders : true;
-        console.log("notifSettings:", notifSettings, "notifyOrdersEnabled:", notifyOrdersEnabled); // TEMP
         const notifyStockEnabled = notifSettings ? notifSettings.notifyStock : true;
 
         const decrementedItems = [];
@@ -93,6 +92,16 @@ const createOrder = async (req, res) => {
             paymentStatus: paymentMethod === "COD" ? undefined : "Pending",
             transferDetails: paymentMethod !== "COD" ? transferDetails : undefined,
         });
+
+        // Populate user (username/email) before broadcasting — matches the shape
+        // getAllOrders() returns, so the admin list can use it directly without a refetch
+        const populatedOrder = await orders.findById(order._id).populate("user", "username email");
+
+        try {
+            await pusher.trigger("admin-orders", "new-order", populatedOrder);
+        } catch (pushErr) {
+            console.log(pushErr, "pusher trigger failed for new-order");
+        }
 
         await createNotification({
             type: "order",
