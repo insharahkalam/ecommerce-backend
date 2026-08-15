@@ -324,6 +324,56 @@ const updatePassword = async (req, res) => {
     }
 };
 
+const updateProfile = async (req, res) => {
+    try {
+        const { username, email } = req.body;
+
+        if (!username && !email) {
+            return res.status(400).json({ message: "Nothing to update." });
+        }
+
+        if (username && username.length < 4) {
+            return res.status(400).json({ message: "Username must be at least 4 characters." });
+        }
+
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        if (email && email !== user.email) {
+            const emailTaken = await User.findOne({ email, _id: { $ne: userId } });
+            if (emailTaken) {
+                return res.status(400).json({ message: "Email is already in use by another account." });
+            }
+            user.email = email;
+        }
+
+        if (username) {
+            user.username = username;
+        }
+
+        await user.save();
+
+        res.status(200).json({
+            message: "Profile updated successfully!",
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+            },
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const logout = (req, res) => {
     try {
         res.clearCookie("token", {
@@ -372,4 +422,4 @@ const getMe = async (req, res) => {
 };
 
 
-export { cretaeUser, getUser, loginUser, forgotPass, resetPassword, logout, getMe, updatePassword }
+export { cretaeUser, getUser, loginUser, forgotPass, resetPassword, logout, getMe, updateProfile, updatePassword }
