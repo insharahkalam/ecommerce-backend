@@ -12,6 +12,6 @@ authRoutes.patch('/updatePassword', adminCheck, updatePassword)
 authRoutes.patch('/updateProfile', adminCheck, updateProfile)
 authRoutes.get('/ViewAllUsers', getUser)
 authRoutes.get('/logout', logout)
-authRoutes.get('/getMe', adminCheck, getMe)
+authRoutes.get('/getMe', getMe)
 
 export default authRoutes
